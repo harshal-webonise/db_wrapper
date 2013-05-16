@@ -32,6 +32,16 @@ class DbWrapper extends PDO
         return self::$db;
     }
 
+    public function from($tableNames)
+    {
+        self::$query .= ' from ';
+        foreach ($tableNames as $table) {
+            self::$query .= $table . ',';
+        }
+        self::$query = rtrim(self::$query, ',');
+        return self::$db;
+    }
+
 }
 
 ?>
