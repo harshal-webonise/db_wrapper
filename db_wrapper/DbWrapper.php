@@ -26,8 +26,9 @@ class DbWrapper extends PDO
     {
         self::$query = 'select ';
         foreach ($fields as $field) {
-            self::$query += $field . ', ';
+            self::$query .= $field . ',';
         }
+        self::$query = rtrim(self::$query, ',');
         return self::$db;
     }
 
