@@ -17,8 +17,12 @@ class DbWrapper extends PDO {
         return self::$db;
     }
 
-    public function select($fields) {
-        self::$query .= 'select ' . implode(', ', $fields);
+    public function select($fields = '*') {
+        if (is_array($fields)) {
+            self::$query .= 'select ' . implode(', ', $fields);
+        } else {
+            self::$query .= 'select *';
+        }
         return self::$db;
     }
 
@@ -39,9 +43,14 @@ class DbWrapper extends PDO {
     public function result() {
         try {
             return self::$db->query(self::$query . ';')->fetchAll(PDO::FETCH_ASSOC);
-        } catch (Exception $e) {
+        } catch (PDOException $e) {
             echo $e->getMessage();
         }
+    }
+
+    public function limit($limit, $offset = null) {
+        self::$query .= " LIMIT $limit" . ($offset != null ? ", $offset" : '');
+        return self::$db;
     }
 
 }

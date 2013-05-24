@@ -4,9 +4,9 @@ require_once('db_wrapper/DbWrapper.php');
 echo '<pre>';
 $conn = DbWrapper::getInstance("localhost", "root", "root", "test");
 
-$r = $conn->select(array('fname'))
+$r = $conn->select()
     ->from(array('users'))
-    ->where(array('id'=>2))
+    ->limit(2,10)
     ->result();
 
 print_r($r);
