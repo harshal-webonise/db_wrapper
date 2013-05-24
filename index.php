@@ -1,11 +1,13 @@
 <?php
 
 require_once('db_wrapper/DbWrapper.php');
+echo '<pre>';
+$conn = DbWrapper::getInstance("localhost", "root", "root", "test");
 
-$conn = DbWrapper::getInstance("localhost","root","webonise6186","db_wrapper");
+$r = $conn->select(array('fname'))
+    ->from(array('users'))
+    ->where(array('id'=>2))
+    ->result();
 
-$conn->select(array('first_name','last_name'))
-     ->from(array('users'))
-     ->where();
-
+print_r($r);
 
