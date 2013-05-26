@@ -1,9 +1,15 @@
 <?php
 class DbWrapper extends PDO {
-    private static $db, $query;
+    private static $db, $query, $instance = 0;
 
     function __construct($hostName, $userName, $password, $databaseName) {
         try {
+
+            if (self::$instance == 1) {
+                throw new Exception('Instance already exist');
+            }
+            self::$instance = 1;
+
             parent::__construct("mysql:host=$hostName;dbname=$databaseName", $userName, $password);
         } catch (PDOException $e) {
             echo "Error: " . $e->getMessage();
@@ -19,20 +25,20 @@ class DbWrapper extends PDO {
 
     public function select($fields = '*') {
         if (is_array($fields)) {
-            self::$query .= 'select ' . implode(', ', $fields);
+            self::$query = 'SELECT ' . implode(', ', $fields);
         } else {
-            self::$query .= 'select *';
+            self::$query = 'SELECT *';
         }
         return self::$db;
     }
 
     public function from($tableNames) {
-        self::$query .= ' from ' . implode(', ', $tableNames);
+        self::$query .= ' FROM ' . implode(', ', $tableNames);
         return self::$db;
     }
 
     public function where($conditions) {
-        self::$query .= ' where';
+        self::$query .= ' WHERE';
         foreach ($conditions as $key => $condition) {
             self::$query .= " $key=" . $condition . ',';
         }
@@ -40,17 +46,35 @@ class DbWrapper extends PDO {
         return self::$db;
     }
 
-    public function result() {
+    public function limit($limit, $offset = null) {
+        self::$query .= " LIMIT $limit" . ($offset != null ? ", $offset" : '');
+        return self::$db;
+    }
+
+    public function orderBy($fieldName, $order = 'ASC') {
+        self::$query .= " ORDER BY $fieldName $order";
+        return self::$db;
+    }
+
+    public function get() {
+        return self::$query;
+    }
+
+    public function result($query = null) {
         try {
-            return self::$db->query(self::$query . ';')->fetchAll(PDO::FETCH_ASSOC);
+            $query = $query == null ? self::$query . ';' : $query;
+            return self::$db->query($query)->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             echo $e->getMessage();
         }
     }
 
-    public function limit($limit, $offset = null) {
-        self::$query .= " LIMIT $limit" . ($offset != null ? ", $offset" : '');
-        return self::$db;
+    public function save() {
+
+    }
+
+    public function delete() {
+
     }
 
 }
