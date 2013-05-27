@@ -4,7 +4,7 @@ class DbWrapper extends PDO {
 
     function __construct($hostName, $userName, $password, $databaseName) {
         try {
-
+            ini_set('display_errors', 1);
             if (self::$instance == 1) {
                 throw new Exception('Instance already exist');
             }
@@ -40,9 +40,9 @@ class DbWrapper extends PDO {
     public function where($conditions) {
         self::$query .= ' WHERE';
         foreach ($conditions as $key => $condition) {
-            self::$query .= " $key=" . $condition . ',';
+            self::$query .= " $key" . $condition . ' AND';
         }
-        self::$query = rtrim(self::$query, ',');
+        self::$query = rtrim(self::$query, 'AND');
         return self::$db;
     }
 
@@ -63,17 +63,21 @@ class DbWrapper extends PDO {
     public function result($query = null) {
         try {
             $query = $query == null ? self::$query . ';' : $query;
-            return self::$db->query($query)->fetchAll(PDO::FETCH_ASSOC);
+            $start = microtime();
+            $stmt = self::$db->query($query);
+            echo 'query took ' . (microtime() - $start) * 1000 . ' ms';
+            echo $query;
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             echo $e->getMessage();
         }
     }
 
-    public function save() {
+    public function save($table, $params, $conditions) {
 
     }
 
-    public function delete() {
+    public function delete($table, $conditions) {
 
     }
 
