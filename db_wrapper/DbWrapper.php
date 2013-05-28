@@ -84,9 +84,16 @@ class DbWrapper {
             echo $this->query;
 
         } else {
-
-            $this->query = 'INSERT INTO $table';
-
+            $this->query = "INSERT INTO $table ";
+            $cols = $vals = "";
+            foreach ($params as $key => $param) {
+                $cols .= $key . ' ,';
+                $vals .= $param . ' ,';
+            }
+            $cols = rtrim($cols, ' ,');
+            $vals = rtrim($vals, ' ,');
+            $this->query .= " ($cols) VALUES ($vals)";
+            echo $this->query;
         }
 
     }
