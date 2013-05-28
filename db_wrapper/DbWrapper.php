@@ -1,68 +1,63 @@
 <?php
-class DbWrapper extends PDO {
-    private static $db, $query, $instance = 0;
+class DbWrapper {
+    private static $db,$instance;
+    private $query;
 
-    function __construct($hostName, $userName, $password, $databaseName) {
-        try {
-            ini_set('display_errors', 1);
-            if (self::$instance == 1) {
-                throw new Exception('Instance already exist');
+    private function __construct() { }
+
+    public static function getInstance() {
+        if (self::$instance === null) {
+            try{
+                ini_set('display_errors',1);
+                self::$db = new PDO("mysql:host=localhost;dbname=test", 'root', 'root');
+                self::$instance = new DbWrapper();
+               } catch (PDOException $e) {
+                echo "Error: " . $e->getMessage();
             }
-            self::$instance = 1;
-
-            parent::__construct("mysql:host=$hostName;dbname=$databaseName", $userName, $password);
-        } catch (PDOException $e) {
-            echo "Error: " . $e->getMessage();
         }
-    }
-
-    public static function getInstance($hostName, $userName, $password, $databaseName) {
-        if (self::$db === null) {
-            self::$db = new DbWrapper($hostName, $userName, $password, $databaseName);
-        }
-        return self::$db;
+        return self::$instance;
     }
 
     public function select($fields = '*') {
         if (is_array($fields)) {
-            self::$query = 'SELECT ' . implode(', ', $fields);
+            $this->query = 'SELECT ' . implode(', ', $fields);
         } else {
-            self::$query = 'SELECT *';
+            $this->query = 'SELECT *';
         }
-        return self::$db;
+        return $this;
     }
 
     public function from($tableNames) {
-        self::$query .= ' FROM ' . implode(', ', $tableNames);
-        return self::$db;
+        $this->query .= ' FROM ' . implode(', ', $tableNames);
+        return $this;
     }
 
     public function where($conditions) {
-        self::$query .= ' WHERE';
+        $this->query .= ' WHERE';
         foreach ($conditions as $key => $condition) {
-            self::$query .= " $key" . $condition . ' AND';
+            $this->query .= " $key" . $condition . ' AND';
         }
-        self::$query = rtrim(self::$query, 'AND');
-        return self::$db;
+        $this->query = rtrim($this->query, 'AND');
+        return $this;
     }
 
     public function limit($limit, $offset = null) {
-        self::$query .= " LIMIT $limit" . ($offset != null ? ", $offset" : '');
-        return self::$db;
+        $this->query .= " LIMIT $limit" . ($offset != null ? ", $offset" : '');
+        return $this;
     }
 
     public function orderBy($fieldName, $order = 'ASC') {
-        self::$query .= " ORDER BY $fieldName $order";
-        return self::$db;
+        $this->query .= " ORDER BY $fieldName $order";
+        return $this;
     }
 
     public function get() {
-        return self::$query;
+        return $this->query;
     }
 
     public function result($query = null) {
         try {
-            $query = $query == null ? self::$query . ';' : $query;
+            $query = $query == null ? $this->query . ';' : $query;
             $start = microtime();
             $stmt = self::$db->query($query);
             echo 'query took ' . (microtime() - $start) * 1000 . ' ms';
