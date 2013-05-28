@@ -5,9 +5,9 @@ echo '<pre>';
 $conn = DbWrapper::getInstance("localhost", "root", "root", "test");
 
 // List all organizations
-$r = $conn->select('*')
-    ->from(array('organizations'))
-    ->result();
+//$r = $conn->select('*')
+//    ->from(array('organizations'))
+//    ->result();
 //
 //print_r($r);
 
@@ -31,5 +31,5 @@ $r = $conn->select('*')
 //    ->where(array('created_on > ' => '2013-02-10 00:00:00'))
 //    ->result();
 
-
-print_r($r);
+$conn->save('users',array('name='=>'sushant'),array('id='=>2));
+//print_r($r);

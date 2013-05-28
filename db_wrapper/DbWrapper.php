@@ -1,17 +1,18 @@
 <?php
 class DbWrapper {
-    private static $db,$instance;
+    private static $db, $instance;
     private $query;
 
-    private function __construct() { }
+    private function __construct() {
+    }
 
     public static function getInstance() {
         if (self::$instance === null) {
-            try{
-                ini_set('display_errors',1);
+            try {
+                ini_set('display_errors', 1);
                 self::$db = new PDO("mysql:host=localhost;dbname=test", 'root', 'root');
                 self::$instance = new DbWrapper();
-               } catch (PDOException $e) {
+            } catch (PDOException $e) {
                 echo "Error: " . $e->getMessage();
             }
         }
@@ -68,7 +69,23 @@ class DbWrapper {
         }
     }
 
-    public function save($table, $params, $conditions) {
+    public function save($table, $params, $conditions = null) {
+        if ($conditions) {
+            $this->query = "UPDATE $table set ";
+            foreach ($params as $key => $param) {
+                $this->query .= $key . $param . ' ,';
+            }
+            $this->query = rtrim($this->query, ',');
+            $this->query .= ' WHERE ';
+            foreach ($conditions as $key => $condition) {
+                $this->query .= " $key" . $condition . ' AND';
+            }
+            $this->query = rtrim($this->query, 'AND');
+            echo $this->query;
+
+        } else {
+
+        }
 
     }
 
