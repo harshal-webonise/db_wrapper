@@ -51,7 +51,7 @@ class DbWrapper {
         return $this;
     }
 
-    public function get() {
+    public function getQuery() {
         return $this->query;
     }
 
