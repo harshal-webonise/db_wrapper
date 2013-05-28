@@ -104,9 +104,6 @@ class DbWrapper {
         $this->query = "DELETE FROM $table" . $this->where_builder($conditions);
 
         return $this;
-
-        echo $this->query;
-
     }
 
     function where_builder($conditions) {
