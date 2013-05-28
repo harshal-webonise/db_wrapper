@@ -95,6 +95,7 @@ class DbWrapper {
             $this->query .= " ($cols) VALUES ($vals)";
             echo $this->query;
         }
+        return $this;
 
     }
 
