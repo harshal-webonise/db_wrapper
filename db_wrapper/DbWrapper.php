@@ -85,6 +85,8 @@ class DbWrapper {
 
         } else {
 
+            $this->query = 'INSERT INTO $table';
+
         }
 
     }
