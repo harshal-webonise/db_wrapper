@@ -101,6 +101,18 @@ class DbWrapper {
 
     public function delete($table, $conditions) {
 
+        $this->query = "DELETE FROM $table" . $this->where_builder($conditions);
+
+        echo $this->query;
+
+    }
+
+    function where_builder($conditions) {
+        $cnd = " WHERE ";
+        foreach ($conditions as $key => $condition) {
+            $cnd .= $key . $condition . ' AND';
+        }
+        return rtrim($cnd, ' AND');
     }
 
 }
