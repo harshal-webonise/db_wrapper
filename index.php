@@ -31,5 +31,6 @@ $conn = DbWrapper::getInstance("localhost", "root", "root", "test");
 //    ->where(array('created_on > ' => '2013-02-10 00:00:00'))
 //    ->result();
 
-$conn->delete('users', array('fname=' => "'sushant'"));
+$conn->delete('users', array('fname=' => "'sushant'", 'id=' => '2'));
+echo $conn->getQuery();
 //print_r($r);

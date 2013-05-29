@@ -34,11 +34,7 @@ class DbWrapper {
     }
 
     public function where($conditions) {
-        $this->query .= ' WHERE';
-        foreach ($conditions as $key => $condition) {
-            $this->query .= " $key" . $condition . ' AND';
-        }
-        $this->query = rtrim($this->query, 'AND');
+        $this->query .= $this->getWhereString($conditions);
         return $this;
     }
 
@@ -76,11 +72,7 @@ class DbWrapper {
                 $this->query .= $key . $param . ' ,';
             }
             $this->query = rtrim($this->query, ',');
-            $this->query .= ' WHERE ';
-            foreach ($conditions as $key => $condition) {
-                $this->query .= " $key" . $condition . ' AND';
-            }
-            $this->query = rtrim($this->query, 'AND');
+            $this->query .= $this->getWhereString($conditions);
             echo $this->query;
 
         } else {
@@ -99,19 +91,23 @@ class DbWrapper {
 
     }
 
-    public function delete($table, $conditions) {
-
-        $this->query = "DELETE FROM $table" . $this->where_builder($conditions);
-
+    public function delete($table, $conditions = null) {
+        $this->query = "DELETE FROM $table" . ($conditions != null ? $this->getWhereString($conditions) : '');
         return $this;
     }
 
-    function where_builder($conditions) {
-        $cnd = " WHERE ";
-        foreach ($conditions as $key => $condition) {
-            $cnd .= $key . $condition . ' AND';
+    function getWhereString($conditions) {
+        $whereStr = ' WHERE ';
+        $operator = 'AND';
+        $cnd = $conditions;
+
+        if (isset($conditions['OR'])) {
+            $cnd = $conditions['OR'];
         }
-        return rtrim($cnd, ' AND');
+        foreach ($cnd as $key => $condition) {
+            $whereStr .= $key . $condition . " $operator ";
+        }
+        return rtrim($whereStr, " $operator");
     }
 
 }
