@@ -160,7 +160,7 @@ class DbWrapper {
         $this->query .= " ($cols) VALUES ($values);";
         $stmt = self::$db->prepare($this->query);
         foreach ($params as $key => $param) {
-            $stmt->bindParam(":{$key}", $param);
+            $stmt->bindValue(":{$key}", $param);
         }
         if(!$stmt->execute()){
             throw new Exception('Error in saving.');
