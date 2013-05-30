@@ -111,19 +111,21 @@ class DbWrapper {
 
     function insert($table, $params) {
         $this->query = "INSERT INTO $table ";
-        $cols = $values = "";
+        $values = "";
         foreach ($params as $key => $param) {
-            $cols .= $key . ' ,';
             $values .= ":$key ,";
         }
-        $cols = rtrim($cols, ' ,');
+        $cols = implode(array_keys($params), ',');
         $values = rtrim($values, ' ,');
         $this->query .= " ($cols) VALUES ($values);";
         $stmt = self::$db->prepare($this->query);
         foreach ($params as $key => $param) {
             $stmt->bindParam(":{$key}", $param);
         }
-        $stmt->execute();
+        if($stmt->execute()){
+            throw new Exception('Error in saving.');
+        }
+        return true;
     }
 
     function update($table, $params, $conditions) {
