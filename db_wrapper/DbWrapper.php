@@ -112,7 +112,7 @@ class DbWrapper {
             $query = $query == null ? $this->query . ';' : $query;
             $start = microtime();
             $stmt = self::$db->query($query);
-            echo 'query took ' . (microtime() - $start) * 1000 . ' ms';
+            echo 'query took ' . (microtime() - $start) * 1000 . ' ms<br>';
             echo $query;
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
