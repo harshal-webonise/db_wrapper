@@ -9,6 +9,10 @@ class DbWrapper {
     private function __construct() {
     }
 
+    /**
+     * Get instance of DbWrapper class
+     * @return object DbWrapper
+     */
     public static function getInstance() {
         if (self::$instance === null) {
             try {
@@ -33,6 +37,11 @@ class DbWrapper {
         return self::$instance;
     }
 
+    /**
+     * Create select statement
+     * @param array of select fields or empty
+     * @return object DbWrapper
+     */
     public function select($fields = '*') {
         if (is_array($fields)) {
             $this->query = 'SELECT ' . implode(', ', $fields);
@@ -42,16 +51,31 @@ class DbWrapper {
         return $this;
     }
 
+    /**
+     * Create from statement
+     * @param array of table names
+     * @return object DbWrapper
+     */
     public function from($tableNames) {
         $this->query .= ' FROM ' . implode(', ', $tableNames);
         return $this;
     }
 
+    /**
+     * Create where statement
+     * @param array of conditions
+     * @return object DbWrapper
+     */
     public function where($conditions) {
         $this->query .= $this->getWhereString($conditions);
         return $this;
     }
 
+    /**
+     * Append limit and offset
+     * @param array of conditions
+     * @return object DbWrapper
+     */
     public function limit($limit, $offset = null) {
         settype($limit, 'integer'); //to prevent sql injection
         $offset != null ? settype($offset, 'integer') : ''; //to prevent sql injection
