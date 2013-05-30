@@ -72,8 +72,9 @@ class DbWrapper {
     }
 
     /**
-     * Append limit and offset
-     * @param array of conditions
+     * Append limit and offset to query
+     * @param integer limit
+     * @param integer offset
      * @return object DbWrapper
      */
     public function limit($limit, $offset = null) {
@@ -83,15 +84,29 @@ class DbWrapper {
         return $this;
     }
 
+    /**
+     * Append order by to query
+     * @param string field name
+     * @return object DbWrapper
+     */
     public function orderBy($fieldName, $order = 'ASC') {
         $this->query .= " ORDER BY $fieldName $order";
         return $this;
     }
 
+    /**
+     * Return current query
+     * @return string query
+     */
     public function getQuery() {
         return $this->query;
     }
 
+    /**
+     * Get result of query
+     * @param string query
+     * @return array result
+     */
     public function result($query = null) {
         try {
             $query = $query == null ? $this->query . ';' : $query;
