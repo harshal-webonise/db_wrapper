@@ -31,6 +31,6 @@ $conn = DbWrapper::getInstance();
 //    ->where(array('created_on > ' => "'2013-02-10 00:00:00'"))
 //    ->result();
 
-//$conn->save('users', array('fname' => "sushant","test"=>"test"));
+$conn->save('users', array('fname' => "sushant","lname"=>"test"));
 //echo $conn->getQuery();
 //print_r($r);

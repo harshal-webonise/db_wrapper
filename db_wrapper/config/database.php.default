@@ -2,4 +2,12 @@
 
 class DB_CONFIG {
 
+    public static $dbParams = array(
+            'host' => '',
+            'datasource' => '',
+            'login' => '',
+            'password' => '',
+            'database' => ''
+        );
+
 }
