@@ -10,7 +10,7 @@ class DbWrapper {
         if (self::$instance === null) {
             try {
                 ini_set('display_errors', 1);
-                self::$db = new PDO("mysql:host=localhost;dbname=test", 'root', 'root');
+                self::$db = new PDO("mysql:host=localhost;dbname=db_wrapper", 'root', 'webonise6186');
                 self::$db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false); // disable emulation of prepared statement
                 self::$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // set error reporting for PDO
                 self::$instance = new DbWrapper();
@@ -71,27 +71,10 @@ class DbWrapper {
 
     public function save($table, $params, $conditions = null) {
         if ($conditions) {
-            $this->query = "UPDATE $table set ";
-            foreach ($params as $key => $param) {
-                $this->query .= $key . $param . ' ,';
-            }
-            $this->query = rtrim($this->query, ',');
-            $this->query .= $this->getWhereString($conditions);
-            echo $this->query;
-
+            $this->update($table, $params, $conditions);
         } else {
-            $this->query = "INSERT INTO $table ";
-            $cols = $vals = "";
-            foreach ($params as $key => $param) {
-                $cols .= $key . ' ,';
-                $vals .= $param . ' ,';
-            }
-            $cols = rtrim($cols, ' ,');
-            $vals = rtrim($vals, ' ,');
-            $this->query .= " ($cols) VALUES ($vals)";
-            echo $this->query;
+            $this->insert($table, $params);
         }
-        return $this;
 
     }
 
@@ -112,6 +95,33 @@ class DbWrapper {
             $whereStr .= $key . $condition . " $operator ";
         }
         return rtrim($whereStr, " $operator");
+    }
+
+    function insert($table, $params) {
+        $this->query = "INSERT INTO $table ";
+        $cols = $values = "";
+        foreach ($params as $key => $param) {
+            $cols .= $key . ' ,';
+            $values .= ":$key ,";
+        }
+        $cols = rtrim($cols, ' ,');
+        $values = rtrim($values, ' ,');
+        $this->query .= " ($cols) VALUES ($values);";
+        $stmt = self::$db->prepare($this->query);
+        foreach ($params as $key => $param) {
+            $stmt->bindParam(":{$key}", $param);
+        }
+        $stmt->execute();
+    }
+
+    function update($table, $params, $conditions) {
+        $this->query = "UPDATE $table set ";
+        foreach ($params as $key => $param) {
+            $this->query .= $key . $param . ' ,';
+        }
+        $this->query = rtrim($this->query, ',');
+        $this->query .= $this->getWhereString($conditions);
+        echo $this->query;
     }
 
 }
