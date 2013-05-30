@@ -41,6 +41,8 @@ class DbWrapper {
     }
 
     public function limit($limit, $offset = null) {
+        settype($limit, 'integer'); //to prevent sql injection
+        $offset != null ? settype($offset, 'integer') : ''; //to prevent sql injection
         $this->query .= " LIMIT $limit" . ($offset != null ? ", $offset" : '');
         return $this;
     }
