@@ -103,6 +103,7 @@ class DbWrapper {
 
         if (isset($conditions['OR'])) {
             $cnd = $conditions['OR'];
+            $operator = 'OR';
         }
         foreach ($cnd as $key => $condition) {
             $whereStr .= $key . $condition . " $operator ";
