@@ -162,7 +162,7 @@ class DbWrapper {
         foreach ($params as $key => $param) {
             $stmt->bindParam(":{$key}", $param);
         }
-        if($stmt->execute()){
+        if(!$stmt->execute()){
             throw new Exception('Error in saving.');
         }
         return true;
