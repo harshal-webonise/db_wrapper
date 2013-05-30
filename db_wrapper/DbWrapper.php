@@ -1,4 +1,7 @@
 <?php
+
+require_once('config/database.php');
+
 class DbWrapper {
     private static $db, $instance;
     private $query;
@@ -10,7 +13,16 @@ class DbWrapper {
         if (self::$instance === null) {
             try {
                 ini_set('display_errors', 1);
-                self::$db = new PDO("mysql:host=localhost;dbname=db_wrapper", 'root', 'webonise6186');
+
+                $dbConfig = new DB_CONFIG();
+
+                self::$db = new PDO(
+                    "{$dbConfig::$dbParams['datasource']}:
+                    host={$dbConfig::$dbParams['host']};
+                    dbname={$dbConfig::$dbParams['database']}",
+                    $dbConfig::$dbParams['login'],
+                    $dbConfig::$dbParams['password']
+                );
                 self::$db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false); // disable emulation of prepared statement
                 self::$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // set error reporting for PDO
                 self::$instance = new DbWrapper();

@@ -2,7 +2,7 @@
 
 require_once('db_wrapper/DbWrapper.php');
 echo '<pre>';
-$conn = DbWrapper::getInstance("localhost", "root", "root", "test");
+$conn = DbWrapper::getInstance();
 
 // List all organizations
 //$r = $conn->select('*')
@@ -31,6 +31,6 @@ $conn = DbWrapper::getInstance("localhost", "root", "root", "test");
 //    ->where(array('created_on > ' => '2013-02-10 00:00:00'))
 //    ->result();
 
-$conn->delete('users', array('fname=' => "'sushant'", 'id=' => '2'));
-echo $conn->getQuery();
+//$conn->save('users', array('fname' => "sushant","test"=>"test"));
+//echo $conn->getQuery();
 //print_r($r);
