@@ -16,17 +16,11 @@ class DbWrapper {
     public static function getInstance() {
         if (self::$instance === null) {
             try {
-                ini_set('display_errors', 1);
+                $dsn = DB_CONFIG::$dbParams['datasource'].':dbname='.DB_CONFIG::$dbParams['database'].';host='.DB_CONFIG::$dbParams['host'];
+                $user = DB_CONFIG::$dbParams['login'];
+                $password = DB_CONFIG::$dbParams['password'];
 
-                $dbConfig = new DB_CONFIG();
-
-                self::$db = new PDO(
-                    "{$dbConfig::$dbParams['datasource']}:
-                    host={$dbConfig::$dbParams['host']};
-                    dbname={$dbConfig::$dbParams['database']}",
-                    $dbConfig::$dbParams['login'],
-                    $dbConfig::$dbParams['password']
-                );
+                self::$db = new PDO($dsn,$user,$password);
                 self::$db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false); // disable emulation of prepared statement
                 self::$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // set error reporting for PDO
                 self::$instance = new DbWrapper();
@@ -62,7 +56,7 @@ class DbWrapper {
     }
 
     /**
-     * Create where statement
+     * Create where string
      * @param array of conditions
      * @return object DbWrapper
      */
@@ -120,6 +114,12 @@ class DbWrapper {
         }
     }
 
+    /**
+     * Run update/insert query
+     * @param string table name
+     * @param array params
+     * @param array conditions
+     */
     public function save($table, $params, $conditions = null) {
         if ($conditions) {
             $this->update($table, $params, $conditions);
@@ -129,11 +129,31 @@ class DbWrapper {
 
     }
 
+    /**
+     * Run delete query
+     * @param string table name
+     * @param array conditions
+     * @return true on success
+     */
     public function delete($table, $conditions = null) {
         $this->query = "DELETE FROM $table" . ($conditions != null ? $this->getWhereString($conditions) : '');
-        return $this;
+        echo $this->query;
+        try {
+            $stmt = self::$db->prepare($this->query);
+            if (!$stmt->execute()) {
+                throw new Exception('Error in deleting.');
+            }
+            return true;
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
     }
 
+    /**
+     * Get where string
+     * @param array conditions
+     * @return string
+     */
     function getWhereString($conditions) {
         $whereStr = ' WHERE ';
         $operator = 'AND';
@@ -143,12 +163,22 @@ class DbWrapper {
             $cnd = $conditions['OR'];
             $operator = 'OR';
         }
+        if (isset($conditions['between'])) {
+            $whereStr .= $conditions['between'][0] . " BETWEEN " . $conditions['between'][1] . ' AND ' . $conditions['between'][2];
+            return $whereStr;
+        }
         foreach ($cnd as $key => $condition) {
             $whereStr .= $key . $condition . " $operator ";
         }
         return rtrim($whereStr, " $operator");
     }
 
+    /**
+     * Run insert query
+     * @param string table name
+     * @param array params
+     * @return true on success
+     */
     function insert($table, $params) {
         $this->query = "INSERT INTO $table ";
         $values = "";
@@ -162,12 +192,19 @@ class DbWrapper {
         foreach ($params as $key => $param) {
             $stmt->bindValue(":{$key}", $param);
         }
-        if(!$stmt->execute()){
+        if (!$stmt->execute()) {
             throw new Exception('Error in saving.');
         }
         return true;
     }
 
+    /**
+     * Run update query
+     * @param string table name
+     * @param array params
+     * @param array conditions
+     * @return true on success
+     */
     function update($table, $params, $conditions) {
         $this->query = "UPDATE $table set ";
         foreach ($params as $key => $param) {
@@ -176,8 +213,26 @@ class DbWrapper {
         $this->query = rtrim($this->query, ',');
         $this->query .= $this->getWhereString($conditions);
         echo $this->query;
+        try {
+            $stmt = self::$db->prepare($this->query);
+            if (!$stmt->execute()) {
+                throw new Exception('Error in saving.');
+            }
+            return true;
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
     }
 
+    /**
+     * Get group by query
+     * @param string field name
+     * @return string
+     */
+    public function groupBy($field) {
+        $this->query .= " group by $field";
+        return $this;
+    }
 }
 
 ?>
